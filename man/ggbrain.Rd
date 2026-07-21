@@ -4,54 +4,68 @@
 \name{geom_brain}
 \alias{geom_brain}
 \alias{GeomBrain}
-\title{Brain geom}
+\title{Plot brain atlas regions}
 \usage{
 geom_brain(
   mapping = aes(),
   data = NULL,
   atlas,
   hemi = NULL,
-  side = NULL,
+  view = NULL,
   position = position_brain(),
+  context = TRUE,
   show.legend = NA,
   inherit.aes = TRUE,
   ...
 )
 }
 \arguments{
-\item{mapping}{argument to pass to \code{\link[ggplot2]{aes}} to map
-variables from the supplied data to the plot}
+\item{mapping}{Set of aesthetic mappings created by [ggplot2::aes()].}
 
-\item{data}{data.frame with data to plot}
+\item{data}{A data.frame containing variables to map. If `NULL`, the atlas
+is plotted without user data. Group it with [dplyr::group_by()] to facet.}
 
-\item{atlas}{object of type brain_atlas to plot}
+\item{atlas}{A `ggseg_atlas` object (e.g. `dk()`, `aseg()`, `tracula()`).}
 
-\item{hemi}{hemisphere to plot. Defaults to everything in the atlas.}
+\item{hemi}{Character vector of hemispheres to include (e.g. `"left"`,
+`"right"`). Defaults to all hemispheres in the atlas.}
 
-\item{side}{slice(s) to plot, as recorded in the "side" column in the atlas data.
-Plot a single slice with a string, or multiple slices with a vector.
-Defaults to all available in the atlas.}
+\item{view}{Character vector of views to include, as recorded in the atlas
+data. For cortical atlases: `"lateral"`, `"medial"`. For subcortical/tract
+atlases: slice identifiers like `"axial_3"`. Defaults to all views.}
 
-\item{position}{position of the data. Default is "identity" but can be
-changed by \code{\link{position_brain}}.}
+\item{position}{Position adjustment, either as a string or the result of
+a call to [position_brain()].}
 
-\item{show.legend}{logical. Should legend be added or not.}
+\item{context}{Keep the rest of the brain as a soft grey backdrop (`TRUE`,
+the default), or show only the regions you're plotting (`FALSE`).}
 
-\item{inherit.aes}{logical. if aes should be inherited from the
-main ggplot call or not}
+\item{show.legend}{Logical. Should this layer be included in the legends?}
 
-\item{...}{arguments to \code{\link[ggplot2]{geom_sf}}}
+\item{inherit.aes}{Logical. If `FALSE`, overrides the default aesthetics
+rather than combining with them.}
+
+\item{...}{Additional arguments passed to [ggplot2::geom_polygon()].}
 }
 \value{
-ggplot object
+A list of ggplot2 layer and coord objects.
 }
 \description{
-call to \code{\link[ggplot2]{geom_sf}}
+Colour brain regions by your own values. Give `geom_brain()` an atlas like
+`dk()` and a data frame, and it matches your values to the right regions and
+lays out the brain views for you. No data? It just draws the atlas.
 }
+\section{GeomBrain ggproto}{
+
+`GeomBrain` is a [ggplot2::Geom] ggproto object that handles rendering
+of brain atlas polygons. It is used internally by [geom_brain()] and
+should not typically be called directly.
+}
+
 \examples{
 library(ggplot2)
 
 ggplot() +
- geom_brain(atlas = dk)
+  geom_brain(atlas = dk())
 }
 \keyword{datasets}

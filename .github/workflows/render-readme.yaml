@@ -1,0 +1,15 @@
+on:
+  push:
+    branches: [main, master]
+    paths: ["README.Rmd"]
+  pull_request:
+    paths: ["README.Rmd"]
+
+name: render-readme
+
+permissions:
+  contents: write
+
+jobs:
+  render-readme:
+    uses: ggsegverse/.github/.github/workflows/render-readme.yaml@main
