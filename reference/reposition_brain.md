@@ -1,0 +1,198 @@
+# Reposition brain slices
+
+Repositions pre-joined sf atlas data (i.e. data and atlas already joined
+to a single sf data frame) for control over final plot layout. For even
+more detailed control, convert the "hemi" and "view" columns into
+factors ordered by wanted order of appearance.
+
+## Usage
+
+``` r
+reposition_brain(
+  data,
+  position = "horizontal",
+  nrow = NULL,
+  ncol = NULL,
+  views = NULL
+)
+```
+
+## Arguments
+
+- data:
+
+  sf-data.frame of joined brain atlas and data
+
+- position:
+
+  Position formula for slices. For cortical atlases, use formulas like
+  \`hemi ~ view\`. For subcortical/tract atlases, use "horizontal",
+  "vertical", or \`type ~ .\` for type-based layout.
+
+- nrow:
+
+  Number of rows for grid layout (subcortical/tract only)
+
+- ncol:
+
+  Number of columns for grid layout (subcortical/tract only)
+
+- views:
+
+  Character vector specifying view order (subcortical/tract only)
+
+## Value
+
+sf-data.frame with re-positioned slices
+
+## Details
+
+This is the sf layout helper. It requires the \`sf\` package (an
+optional dependency); for the sf-free default, build a layout with
+\[position_brain()\] and pass it to \[geom_brain()\].
+
+## Examples
+
+``` r
+reposition_brain(dk(), hemi ~ view)
+#> Simple feature collection with 191 features and 8 fields
+#> Geometry type: MULTIPOLYGON
+#> Dimension:     XY
+#> Bounding box:  xmin: -29.07095 ymin: -29.07095 xmax: 2936.166 ymax: 974.9328
+#> CRS:           NA
+#> # A tibble: 191 × 9
+#>    label   view  hemi  region lobe                   geometry atlas type  colour
+#>  * <chr>   <chr> <chr> <chr>  <chr>            <MULTIPOLYGON> <chr> <chr> <chr> 
+#>  1 lh_unk… infe… left  NA     NA    (((283.0321 93.76352, 43… dk    cort… NA    
+#>  2 lh_ban… infe… left  banks… temp… (((450.3846 295.7177, 47… dk    cort… #1964…
+#>  3 lh_cau… infe… left  cauda… fron… (((188.6943 302.0361, 18… dk    cort… #6419…
+#>  4 lh_cor… infe… left  corpu… whit… (((402.2002 121.1967, 40… dk    cort… #7846…
+#>  5 lh_ent… infe… left  entor… temp… (((274.1602 156.9255, 31… dk    cort… #DC14…
+#>  6 lh_fro… infe… left  front… fron… (((17.16195 122.8896, 26… dk    cort… #6400…
+#>  7 lh_fus… infe… left  fusif… temp… (((559.6909 157.8355, 56… dk    cort… #B4DC…
+#>  8 lh_inf… infe… left  infer… pari… (((467.6347 325.1216, 46… dk    cort… #DC3C…
+#>  9 lh_inf… infe… left  infer… temp… (((245.822 185.0794, 255… dk    cort… #B428…
+#> 10 lh_ins… infe… left  insula insu… (((181.2922 169.843, 191… dk    cort… #FFC0…
+#> # ℹ 181 more rows
+reposition_brain(dk(), view ~ hemi)
+#> Simple feature collection with 191 features and 8 fields
+#> Geometry type: MULTIPOLYGON
+#> Dimension:     XY
+#> Bounding box:  xmin: -19.19707 ymin: -19.19707 xmax: 1409.547 ymax: 1938.904
+#> CRS:           NA
+#> # A tibble: 191 × 9
+#>    label   view  hemi  region lobe                   geometry atlas type  colour
+#>  * <chr>   <chr> <chr> <chr>  <chr>            <MULTIPOLYGON> <chr> <chr> <chr> 
+#>  1 lh_unk… infe… left  NA     NA    (((283.0321 93.76352, 43… dk    cort… NA    
+#>  2 lh_ban… infe… left  banks… temp… (((450.3846 295.7177, 47… dk    cort… #1964…
+#>  3 lh_cau… infe… left  cauda… fron… (((188.6943 302.0361, 18… dk    cort… #6419…
+#>  4 lh_cor… infe… left  corpu… whit… (((402.2002 121.1967, 40… dk    cort… #7846…
+#>  5 lh_ent… infe… left  entor… temp… (((274.1602 156.9255, 31… dk    cort… #DC14…
+#>  6 lh_fro… infe… left  front… fron… (((17.16195 122.8896, 26… dk    cort… #6400…
+#>  7 lh_fus… infe… left  fusif… temp… (((559.6909 157.8355, 56… dk    cort… #B4DC…
+#>  8 lh_inf… infe… left  infer… pari… (((467.6347 325.1216, 46… dk    cort… #DC3C…
+#>  9 lh_inf… infe… left  infer… temp… (((245.822 185.0794, 255… dk    cort… #B428…
+#> 10 lh_ins… infe… left  insula insu… (((181.2922 169.843, 191… dk    cort… #FFC0…
+#> # ℹ 181 more rows
+reposition_brain(dk(), hemi + view ~ .)
+#> Simple feature collection with 191 features and 8 fields
+#> Geometry type: MULTIPOLYGON
+#> Dimension:     XY
+#> Bounding box:  xmin: -39.83406 ymin: -39.83406 xmax: 671.8112 ymax: 4023.24
+#> CRS:           NA
+#> # A tibble: 191 × 9
+#>    label   view  hemi  region lobe                   geometry atlas type  colour
+#>  * <chr>   <chr> <chr> <chr>  <chr>            <MULTIPOLYGON> <chr> <chr> <chr> 
+#>  1 lh_unk… infe… left  NA     NA    (((283.0321 93.76352, 43… dk    cort… NA    
+#>  2 lh_ban… infe… left  banks… temp… (((450.3846 295.7177, 47… dk    cort… #1964…
+#>  3 lh_cau… infe… left  cauda… fron… (((188.6943 302.0361, 18… dk    cort… #6419…
+#>  4 lh_cor… infe… left  corpu… whit… (((402.2002 121.1967, 40… dk    cort… #7846…
+#>  5 lh_ent… infe… left  entor… temp… (((274.1602 156.9255, 31… dk    cort… #DC14…
+#>  6 lh_fro… infe… left  front… fron… (((17.16195 122.8896, 26… dk    cort… #6400…
+#>  7 lh_fus… infe… left  fusif… temp… (((559.6909 157.8355, 56… dk    cort… #B4DC…
+#>  8 lh_inf… infe… left  infer… pari… (((467.6347 325.1216, 46… dk    cort… #DC3C…
+#>  9 lh_inf… infe… left  infer… temp… (((245.822 185.0794, 255… dk    cort… #B428…
+#> 10 lh_ins… infe… left  insula insu… (((181.2922 169.843, 191… dk    cort… #FFC0…
+#> # ℹ 181 more rows
+reposition_brain(dk(), . ~ hemi + view)
+#> Simple feature collection with 191 features and 8 fields
+#> Geometry type: MULTIPOLYGON
+#> Dimension:     XY
+#> Bounding box:  xmin: -59.40585 ymin: -59.40585 xmax: 5999.991 ymax: 489.3431
+#> CRS:           NA
+#> # A tibble: 191 × 9
+#>    label   view  hemi  region lobe                   geometry atlas type  colour
+#>  * <chr>   <chr> <chr> <chr>  <chr>            <MULTIPOLYGON> <chr> <chr> <chr> 
+#>  1 lh_unk… infe… left  NA     NA    (((283.0321 93.76352, 43… dk    cort… NA    
+#>  2 lh_ban… infe… left  banks… temp… (((450.3846 295.7177, 47… dk    cort… #1964…
+#>  3 lh_cau… infe… left  cauda… fron… (((188.6943 302.0361, 18… dk    cort… #6419…
+#>  4 lh_cor… infe… left  corpu… whit… (((402.2002 121.1967, 40… dk    cort… #7846…
+#>  5 lh_ent… infe… left  entor… temp… (((274.1602 156.9255, 31… dk    cort… #DC14…
+#>  6 lh_fro… infe… left  front… fron… (((17.16195 122.8896, 26… dk    cort… #6400…
+#>  7 lh_fus… infe… left  fusif… temp… (((559.6909 157.8355, 56… dk    cort… #B4DC…
+#>  8 lh_inf… infe… left  infer… pari… (((467.6347 325.1216, 46… dk    cort… #DC3C…
+#>  9 lh_inf… infe… left  infer… temp… (((245.822 185.0794, 255… dk    cort… #B428…
+#> 10 lh_ins… infe… left  insula insu… (((181.2922 169.843, 191… dk    cort… #FFC0…
+#> # ℹ 181 more rows
+
+# \donttest{
+reposition_brain(aseg(), nrow = 2)
+#> Simple feature collection with 262 features and 8 fields
+#> Geometry type: MULTIPOLYGON
+#> Dimension:     XY
+#> Bounding box:  xmin: -12.1513 ymin: -12.1513 xmax: 1227.281 ymax: 610.7836
+#> CRS:           NA
+#> First 10 features:
+#>                   label      view hemi         region     structure atlas
+#> 256             cortex_ coronal_2 <NA>           <NA>          <NA>  aseg
+#> 5            Brain-Stem coronal_2 <NA>     Brain Stem     brainstem  aseg
+#> 10          CC_Anterior coronal_2 <NA>    cc anterior          <NA>  aseg
+#> 15           CC_Central coronal_2 <NA>     cc central          <NA>  aseg
+#> 31  Left-Accumbens-area coronal_2 left accumbens area          <NA>  aseg
+#> 40        Left-Amygdala coronal_2 left       Amygdala        limbic  aseg
+#> 41        Left-Amygdala coronal_2 left       Amygdala        limbic  aseg
+#> 52         Left-Caudate coronal_2 left        Caudate basal ganglia  aseg
+#> 53         Left-Caudate coronal_2 left        Caudate basal ganglia  aseg
+#> 70     Left-Hippocampus coronal_2 left    Hippocampus        limbic  aseg
+#>            type  colour                       geometry
+#> 256 subcortical    <NA> MULTIPOLYGON (((144.4187 21...
+#> 5   subcortical #779FB0 MULTIPOLYGON (((125.55 58.9...
+#> 10  subcortical #0000FF MULTIPOLYGON (((133.3539 14...
+#> 15  subcortical #0000A0 MULTIPOLYGON (((132.344 150...
+#> 31  subcortical #FFA500 MULTIPOLYGON (((125.2612 12...
+#> 40  subcortical #67FFFF MULTIPOLYGON (((89.67841 68...
+#> 41  subcortical #67FFFF MULTIPOLYGON (((89.67841 68...
+#> 52  subcortical #7ABADC MULTIPOLYGON (((115.2978 12...
+#> 53  subcortical #7ABADC MULTIPOLYGON (((115.2978 12...
+#> 70  subcortical #DCD814 MULTIPOLYGON (((91.13218 68...
+reposition_brain(aseg(), views = c("sagittal", "axial_3"))
+#> Simple feature collection with 61 features and 8 fields
+#> Geometry type: MULTIPOLYGON
+#> Dimension:     XY
+#> Bounding box:  xmin: -5.66502 ymin: -5.66502 xmax: 572.167 ymax: 262.8586
+#> CRS:           NA
+#> First 10 features:
+#>                      label     view hemi           region     structure atlas
+#> 257                cortex_ sagittal <NA>             <NA>          <NA>  aseg
+#> 6               Brain-Stem sagittal <NA>       Brain Stem     brainstem  aseg
+#> 11             CC_Anterior sagittal <NA>      cc anterior          <NA>  aseg
+#> 16              CC_Central sagittal <NA>       cc central          <NA>  aseg
+#> 19         CC_Mid_Anterior sagittal <NA>  cc mid anterior          <NA>  aseg
+#> 23        CC_Mid_Posterior sagittal <NA> cc mid posterior          <NA>  aseg
+#> 25            CC_Posterior sagittal <NA>     cc posterior          <NA>  aseg
+#> 56  Left-Cerebellum-Cortex sagittal left       Cerebellum    cerebellum  aseg
+#> 57  Left-Cerebellum-Cortex sagittal left       Cerebellum    cerebellum  aseg
+#> 120          Left-Thalamus sagittal left         Thalamus basal ganglia  aseg
+#>            type  colour                       geometry
+#> 257 subcortical    <NA> MULTIPOLYGON (((65.44853 20...
+#> 6   subcortical #779FB0 MULTIPOLYGON (((92.93022 12...
+#> 11  subcortical #0000FF MULTIPOLYGON (((189.3959 11...
+#> 16  subcortical #0000A0 MULTIPOLYGON (((164.3167 15...
+#> 19  subcortical #0000D0 MULTIPOLYGON (((188.9379 14...
+#> 23  subcortical #000070 MULTIPOLYGON (((123.7356 15...
+#> 25  subcortical #000040 MULTIPOLYGON (((95.71832 13...
+#> 56  subcortical #E69422 MULTIPOLYGON (((62.23099 10...
+#> 57  subcortical #E69422 MULTIPOLYGON (((62.23099 10...
+#> 120 subcortical #00760E MULTIPOLYGON (((140.0147 13...
+# }
+```
