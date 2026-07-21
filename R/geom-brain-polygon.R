@@ -91,10 +91,10 @@ geom_brain_polygon <- function(
   class(user_mapping) <- "uneval"
 
   dots <- list(...)
-  if (!"colour" %in% names(dots) && !"color" %in% names(dots)) {
+  if (all(!"colour" %in% names(dots), !"color" %in% names(dots), !"colour" %in% names(user_mapping), !"color" %in% names(user_mapping))) {
     dots$colour <- "grey35"
   }
-  if (!"linewidth" %in% names(dots) && !"size" %in% names(dots)) {
+  if (all(!"linewidth" %in% names(dots), !"size" %in% names(dots), !"linewidth" %in% names(user_mapping), !"size" %in% names(user_mapping))) {
     dots$linewidth <- 0.2
   }
 
