@@ -19,7 +19,9 @@ describe("geom_brain_polygon()", {
   it("errors when the atlas has no 2D geometry", {
     no_geom <- atlas_without_2d_geometry()
     expect_error(
-      ggplot2::ggplot() + geom_brain_polygon(atlas = no_geom),
+      ggplot2::ggplot_build(
+        ggplot2::ggplot() + geom_brain_polygon(atlas = no_geom)
+      ),
       "no 2D geometry"
     )
   })
@@ -35,7 +37,9 @@ describe("geom_brain_polygon()", {
   it("rejects invalid views with a clear error", {
     poly <- ggseg.formats::as_polygon_atlas(dk())
     expect_error(
-      ggplot2::ggplot() + geom_brain_polygon(atlas = poly, view = "nope"),
+      ggplot2::ggplot_build(
+        ggplot2::ggplot() + geom_brain_polygon(atlas = poly, view = "nope")
+      ),
       "Invalid view"
     )
   })
@@ -211,6 +215,76 @@ describe("brain_join_polygon() faceting", {
     joined <- brain_join_polygon(data, flat)
     expect_true("group" %in% names(joined))
     expect_equal(unique(joined$group[joined$region %in% "insula"]), "cohort1")
+  })
+})
+
+describe("geom_brain() inherits top-level data and aes (ggseg#158)", {
+  # Regression test for ggsegverse/ggseg#158: data and aesthetics set in the
+  # top-level ggplot() call were dropped by the eager polygon build, so fill
+  # fell back to the region labels instead of the user's mapped values.
+  fill_column <- function(p) {
+    ggplot2::ggplot_build(p)$data[[1]]$fill
+  }
+
+  # Adding a user fill scale on top of the atlas default emits an expected
+  # "Scale for fill is already present" message at plot-construction time.
+  labelled_values <- function() {
+    data.frame(
+      label = ggseg.formats::atlas_labels(dk()),
+      value = seq_along(ggseg.formats::atlas_labels(dk()))
+    )
+  }
+
+  it("uses a continuous fill mapped in ggplot(), not the region labels", {
+    mex <- labelled_values()
+    p <- suppressMessages(
+      ggplot2::ggplot(mex, ggplot2::aes(fill = value)) +
+        geom_brain(atlas = dk()) +
+        ggplot2::scale_fill_viridis_c()
+    )
+    # The bug threw "Discrete value supplied to a continuous scale" at build.
+    expect_no_error(fills <- fill_column(p))
+    # A continuous scale resolves to many hex colours; unmatched context
+    # regions keep the scale's grey na.value.
+    expect_gt(length(unique(grep("^#", fills, value = TRUE))), 2)
+    # Fill must not fall back to the region labels.
+    expect_false(any(fills %in% ggseg.formats::atlas_labels(dk())))
+  })
+
+  it("matches the explicit geom-level data= workaround from the issue", {
+    mex <- labelled_values()
+    inherited <- suppressMessages(
+      ggplot2::ggplot(mex, ggplot2::aes(fill = value)) +
+        geom_brain(atlas = dk()) +
+        ggplot2::scale_fill_viridis_c()
+    )
+    explicit <- suppressMessages(
+      ggplot2::ggplot() +
+        geom_brain(data = mex, atlas = dk(), ggplot2::aes(fill = value)) +
+        ggplot2::scale_fill_viridis_c()
+    )
+    expect_equal(fill_column(inherited), fill_column(explicit))
+  })
+
+  it("still colours by the atlas palette when no fill is mapped anywhere", {
+    p <- ggplot2::ggplot() + geom_brain(atlas = dk())
+    fills <- unique(fill_column(p))
+    expect_gt(length(fills), 2)
+  })
+
+  it("replicates the atlas per facet for inherited grouped-by-facet data", {
+    mex <- rbind(
+      cbind(labelled_values(), cohort = "A"),
+      cbind(labelled_values(), cohort = "B")
+    )
+    p <- suppressMessages(
+      ggplot2::ggplot(mex, ggplot2::aes(fill = value)) +
+        geom_brain(atlas = dk()) +
+        ggplot2::facet_wrap(~cohort) +
+        ggplot2::scale_fill_viridis_c()
+    )
+    g <- ggplot2::ggplot_build(p)
+    expect_setequal(unique(g$data[[1]]$PANEL), factor(c(1, 2)))
   })
 })
 
